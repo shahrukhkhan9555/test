@@ -1,0 +1,23 @@
+version: 0.1
+phases:
+  install:
+    commands:
+      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket srk-assignment-bucket --output-template-file outputSamTemplate.yaml
+      - pip install --upgrade pip
+      - pip install pylint
+      
+  build:
+    commands:
+      - pylint /LambdaCode/lambda_function.py > /pylint-result.txt
+
+
+  post_build:
+    commands:
+      - aws s3 cp /pylint-result.txt s3://srk-assignment-bucket
+
+artifacts:
+  type: zip
+  files:
+    - samTemplate.yaml
+    - outputSamTemplate.yaml
+  
